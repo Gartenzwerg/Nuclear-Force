@@ -1,0 +1,6 @@
+"L-S.cpp" contatins the code for solving the Lippmann-Schwinger equation. 
+It utilizes the "gauleg" function in "lib.cpp", and hence should be compiled and linked with "lib.cpp".
+
+"SE.cpp" is a code for finding phase shifts through direct integration of the Schrödinger equation.
+
+A different code for solving the Lippmann-Schwinger equation by Dillon Frame can also be found at https://github.com/dkframe/PHY989-Project-1 .
