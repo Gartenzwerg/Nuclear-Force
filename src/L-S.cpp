@@ -3,6 +3,7 @@
 #include <cmath>
 #include "lib.h"
 #include <armadillo>
+#include <fstream>
 
 using namespace std;
 using namespace arma;
@@ -13,7 +14,7 @@ const double constant = 197.3; //h_bar*c in MeV*fm
 const double mu = 0.7;
 const double Va = -10.463, Vb = -1650.6, Vc = 6484.3;
 const double a = 1, b = 4, c = 7;
-int N = 2000;
+int N = 50;
 
 //set up the mesh points and weights
 void mesh (double x[], double w[], int N);
@@ -23,42 +24,47 @@ void potential(double **V, double k[], int N);
 void Amatrix(double **A, double **V, double k[], double w[], int N);
 
 int main() {
-	double k[N+1], w[N], k_0 = 1.553898866; //in fm^{-1}
-	double **V, **A;
 
-	k[N] = k_0;
+	double E = 0.5 ;// in MeV
+	double k[N+1], w[N]; //in fm^{-1}
+	double **V, **A;
+	ofstream fout;
+
+	fout.open("sc_50.dat",ios::app);
 	mesh(k, w, N);
-	/*for(int i = 0; i < N; ++i) {
-		cout<<k[i]<<"	"<<w[i]<<endl;
-	}*/
 	V = new double *[N+1];
 	A = new double *[N+1];
 	for(int i = 0; i < (N+1); ++i) {
 		V[i] = new double [N+1];
 		A[i] = new double [N+1];
 	}
-	potential(V, k, N);
-	Amatrix(A, V, k, w, N);
-	
-	mat matR(N+1, N+1), matA(N+1, N+1), matV(N+1, N+1);
-	for(int i = 0; i < (N+1); i++) {
-		for(int j = 0; j < (N+1); j++) {
-			matA(i, j) = A[i][j];
-			matV(i, j) = V[i][j];
+	for(int loopCounter = 0; loopCounter < 300; loopCounter++) {
+		k[N] = sqrt(m*E)/constant;
+		potential(V, k, N);
+		Amatrix(A, V, k, w, N);	
+		mat matR(N+1, N+1), matA(N+1, N+1), matV(N+1, N+1);
+		for(int i = 0; i < (N+1); i++) {
+			for(int j = 0; j < (N+1); j++) {
+				matA(i, j) = A[i][j];
+				matV(i, j) = V[i][j];
+			}
 		}
+
+		matR = inv(matA) * matV;
+
+		fout<<E<<"	"<<atan(-matR(N, N)*m*k[N]/(constant*constant))<<endl;
+		E += 0.5;
 	}
-
-	matR = inv(matA) * matV;
-	//cout<<matR(N, N);
-
-	cout<<"phase shift at E = "<<(k_0*constant)*(k_0*constant)/m<<"MeV is "<<atan(-matR(N, N)*m*k_0/(constant*constant))<<".\n";
+	
 }
 
 void mesh (double x[], double w[], int N) {
 	gauleg(-1, 1, x, w, N);
+	double temp = 0;
 	for(int i = 0; i < N; ++i) {
-		x[i] = 10000.*x[i]+10000.;
-		w[i] = w[i]*10000.;
+		temp = cos( PI*(1.+x[i])/4. );
+		x[i] = tan( PI*(1.+x[i])/4. );
+		w[i] = w[i]*(PI/4.)/(temp*temp);
 	}
 }
 
