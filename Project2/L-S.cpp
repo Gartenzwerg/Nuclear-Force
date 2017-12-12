@@ -15,7 +15,7 @@ const double constant = 197.3; //h_bar*c in MeV*fm
 const double mu = 0.7;
 const double Va = -10.463, Vb = -1650.6, Vc = 6484.3;
 const double a = 1, b = 4, c = 7;
-const double L = 0.696*1.4;
+const double L = 0.696;
 int N = 50;
 int maxEcount = 100; //MaxEnergy = maxEcount*0.05 (MeV)
 
@@ -47,10 +47,10 @@ int main() {
 	double error_derivative[4];
 	// ofstream fout;
 
-	C[0] = attempt_C[0] = prev_C[0] = best_C[0] = -56.0252;	//C0
-	C[1] = attempt_C[1] = prev_C[1] = best_C[1] = 18.2039;	//C2
-	C[2] = attempt_C[2] = prev_C[2] = best_C[2] = 0;	//C4
-	C[3] = attempt_C[3] = prev_C[3] = best_C[3] = 0;	//C4'
+	C[0] = attempt_C[0] = prev_C[0] = best_C[0] = -99.8683;	//C0
+	C[1] = attempt_C[1] = prev_C[1] = best_C[1] = 92.4564;	//C2
+	C[2] = attempt_C[2] = prev_C[2] = best_C[2] = -342.975;	//C4
+	C[3] = attempt_C[3] = prev_C[3] = best_C[3] = -426.396;	//C4'
 
 	// fout.open("sc_50.dat");
 
@@ -88,7 +88,7 @@ int main() {
 
 		Compute_phseshfits(V, A, k, w, N, curr_C, C_num, curr_phaseshifts);
 		curr_error = errorFunction(ref_phaseshifts, curr_phaseshifts, maxEcount);
-		cout<<curr_error<<" "<<min_error<<" "<<prev_error<<endl;
+		// cout<<curr_error<<" "<<min_error<<" "<<prev_error<<endl;
 
 		if(curr_error < min_error) {
 			if((min_error-curr_error) > 0.001) unchanged_min_count = 0;
@@ -271,8 +271,8 @@ void Compute_phseshfits(double **V, double **A, double k[], double w[], int N, d
 			Yukawa_potential(V, k, N);
 		} else if(C_num > 0) {
 			// !!! MANUAL SWITCH !!! //
-			// Effective_potential(V, k, N, C, C_num);
-			Pion_Effective_potential(V, k, N, C, C_num);
+			Effective_potential(V, k, N, C, C_num);
+			// Pion_Effective_potential(V, k, N, C, C_num);
 		}
 		Amatrix(A, V, k, w, N);	
 		mat matR(N+1, N+1), matA(N+1, N+1), matV(N+1, N+1);
